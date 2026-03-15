@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P-Tech Profesyonel Rapor Formu</title>
+    <style>
+        :root { --border-color: #000; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+        
+        /* Kontrol Paneli */
+        .controls { background: #fff; padding: 20px; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .controls input, .controls textarea, .controls button { margin-bottom: 10px; padding: 12px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-group { display: flex; gap: 10px; }
+        button { cursor: pointer; border: none; font-weight: bold; transition: 0.3s; }
+        .add-btn { background: #28a745; color: white; }
+        .pdf-btn { background: #003366; color: white; }
+        button:hover { opacity: 0.8; }
+
+        /* A4 Düzeni */
+        .page { width: 210mm; height: 296mm; padding: 10mm; margin: 10mm auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.2); box-sizing: border-box; overflow: hidden; }
+        
+        /* Header Yapısı */
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .header-table td { border: 1px solid var(--border-color); padding: 5px; vertical-align: middle; text-align: center; }
+        .logo-box { width: 25%; }
+        .logo-box img { max-width: 140px; height: auto; display: block; margin: auto; }
+        .title-box { width: 50%; font-weight: bold; font-size: 14pt; }
+        .info-box { width: 25%; font-size: 9pt; padding: 0 !important; }
+        .info-table { width: 100%; border-collapse: collapse; }
+        .info-table td { border: none !important; border-bottom: 1px solid #000 !important; padding: 4px !important; text-align: left !important; }
+        .info-table tr:last-child td { border-bottom: none !important; }
+
+        /* Metin Alanları */
+        .engineer-row { margin: 10px 0; font-weight: bold; font-size: 10pt; }
+        .task-box { border: 1px solid var(--border-color); height: 280px; padding: 10px; margin-bottom: 10px; font-size: 10pt; }
+        .task-list { padding-left: 20px; margin: 0; }
+        
+        .visual-bar { border: 1px solid var(--border-color); text-align: center; font-weight: bold; padding: 4px; margin-bottom: 8px; font-size: 10pt; background: #fff; }
+        
+        /* Dikey Resim Düzeni (4'lü) */
+        .image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; height: auto; }
+        .image-item { border: 1px solid #000; height: 380px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; background: #fdfdfd; }
+        .image-item img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .image-item span { color: #555; font-size: 11px; text-align: center; font-weight: bold; }
+
+        /* Yazdırma Modu */
+        @media print {
+            .controls, .image-item span { display: none !important; }
+            body { background: none; }
+            .page { margin: 0; border: none; box-shadow: none; page-break-after: always; }
+            @page { size: A4; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <h3>P-Tech Rapor Paneli</h3>
+    <input type="date" id="inputDate">
+    <input type="text" id="inputEngineer" placeholder="Mühendis İsimlerini Girin..." value="İHSAN ÇETİN">
+    <textarea id="inputTasks" rows="4" placeholder="Yapılan işleri satır satır yazın..."></textarea>
+    <div class="btn-group">
+        <button class="add-btn" onclick="addNewPage()">+ Yeni Sayfa Ekle (4 Dikey Resim)</button>
+        <button class="pdf-btn" onclick="window.print()">PDF OLARAK İNDİR</button>
+    </div>
+</div>
+
+<div id="reportContainer">
+    <div class="page">
+        <table class="header-table">
+            <tr>
+                <td class="logo-box"><img src="logo.png" alt="P-TECH"></td>
+                <td class="title-box">P Tech Günlük İş Takip Raporu</td>
+                <td class="info-box">
+                    <table class="info-table">
+                        <tr><td>Tarih: <span class="outDate">15.03.2026</span></td></tr>
+                        <tr><td>Sayfa: 1</td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <div class="engineer-row">TAKİBİ YAPAN MÜHENDİS: <span class="outEngineer">İHSAN ÇETİN</span></div>
+
+        <div class="task-box">
+            <strong>TAKİBİ YAPILAN İŞLER:</strong>
+            <ol class="task-list" id="outTasks"></ol>
+        </div>
+
+        <div class="visual-bar">Takibi Yapılan İşin Görselleri</div>
+        <div class="image-grid">
+            <div class="image-item" onclick="triggerFile(1)">
+                <span id="label1">+ FOTOĞRAF EKLE (DİKEY)</span>
+                <img id="prev1"><input type="file" id="file1" hidden onchange="preview(this, 'prev1', 'label1')">
+            </div>
+            <div class="image-item" onclick="triggerFile(2)">
+                <span id="label2">+ FOTOĞRAF EKLE (DİKEY)</span>
+                <img id="prev2"><input type="file" id="file2" hidden onchange="preview(this, 'prev2', 'label2')">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pageCount = 1;
+    let imgCount = 2;
+
+    // Tarih Formatlama (GG.AA.YYYY)
+    document.getElementById('inputDate').addEventListener('change', function(e) {
+        const date = new Date(e.target.value);
+        const formatted = date.toLocaleDateString('tr-TR');
+        document.querySelectorAll('.outDate').forEach(el => el.innerText = formatted);
+    });
+
+    // Mühendis İsmi Güncelleme
+    document.getElementById('inputEngineer').addEventListener('input', e => {
+        document.querySelectorAll('.outEngineer').forEach(el => el.innerText = e.target.value.toUpperCase());
+    });
+
+    // İş Listesi Güncelleme
+    document.getElementById('inputTasks').addEventListener('input', e => {
+        const lines = e.target.value.split('\n');
+        document.getElementById('outTasks').innerHTML = lines.map(l => l.trim() ? `<li>${l}</li>` : '').join('');
+    });
+
+    function triggerFile(id) { document.getElementById('file' + id).click(); }
+
+    function preview(input, prevId, labelId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.getElementById(prevId);
+                img.src = e.target.result;
+                img.style.display = 'block';
+                document.getElementById(labelId).style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function addNewPage() {
+        pageCount++;
+        const container = document.getElementById('reportContainer');
+        const newPage = document.createElement('div');
+        newPage.className = 'page';
+        
+        let gridHtml = '';
+        for(let i=1; i<=4; i++) {
+            imgCount++;
+            gridHtml += `
+                <div class="image-item" onclick="triggerFile(${imgCount})">
+                    <span id="label${imgCount}">+ FOTOĞRAF EKLE (DİKEY)</span>
+                    <img id="prev${imgCount}">
+                    <input type="file" id="file${imgCount}" hidden onchange="preview(this, 'prev${imgCount}', 'label${imgCount}')">
+                </div>`;
+        }
+
+        const currentDate = document.getElementById('inputDate').value 
+            ? new Date(document.getElementById('inputDate').value).toLocaleDateString('tr-TR') 
+            : "15.03.2026";
+
+        newPage.innerHTML = `
+            <table class="header-table">
+                <tr>
+                    <td class="logo-box"><img src="logo.png" alt="P-TECH"></td>
+                    <td class="title-box">P Tech Günlük İş Takip Raporu</td>
+                    <td class="info-box">
+                        <table class="info-table">
+                            <tr><td>Tarih: ${currentDate}</td></tr>
+                            <tr><td>Sayfa: ${pageCount}</td></tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <div class="image-grid" style="grid-template-rows: 1fr 1fr; height: 850px; margin-top: 10px;">
+                ${gridHtml}
+            </div>
+        `;
+        container.appendChild(newPage);
+    }
+</script>
+
+</body>
+</html>
