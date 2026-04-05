@@ -2,7 +2,6 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P-Tech Profesyonel Rapor Formu</title>
     <style>
         :root { --border-color: #000; }
@@ -10,44 +9,55 @@
         
         /* Kontrol Paneli */
         .controls { background: #fff; padding: 20px; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .controls input, .controls textarea, .controls button { margin-bottom: 10px; padding: 12px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-group { display: flex; gap: 10px; }
-        button { cursor: pointer; border: none; font-weight: bold; transition: 0.3s; }
-        .add-btn { background: #28a745; color: white; }
-        .pdf-btn { background: #003366; color: white; }
-        button:hover { opacity: 0.8; }
+        .controls input, .controls button { margin-bottom: 10px; padding: 12px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-group { display: flex; gap: 8px; margin-bottom: 10px; }
+        button { cursor: pointer; border: none; font-weight: bold; transition: 0.3s; padding: 12px; border-radius: 4px; }
+        .add-btn { background: #28a745; color: white; flex: 1; }
+        .sub-btn { background: #6c757d; color: white; flex: 1; }
+        .pdf-btn { background: #003366; color: white; flex: 1; }
 
         /* A4 Düzeni */
-        .page { width: 210mm; height: 296mm; padding: 10mm; margin: 10mm auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.2); box-sizing: border-box; overflow: hidden; }
+        .page { width: 210mm; height: 296mm; padding: 10mm; margin: 10mm auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.2); box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* Header Yapısı */
-        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        /* Header */
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 5px; flex-shrink: 0; }
         .header-table td { border: 1px solid var(--border-color); padding: 5px; vertical-align: middle; text-align: center; }
-        .logo-box { width: 25%; }
-        .logo-box img { max-width: 140px; height: auto; display: block; margin: auto; }
-        .title-box { width: 50%; font-weight: bold; font-size: 14pt; }
-        .info-box { width: 25%; font-size: 9pt; padding: 0 !important; }
+        .logo-box img { max-width: 120px; height: auto; display: block; margin: auto; }
+        .title-box { font-weight: bold; font-size: 14pt; }
         .info-table { width: 100%; border-collapse: collapse; }
-        .info-table td { border: none !important; border-bottom: 1px solid #000 !important; padding: 4px !important; text-align: left !important; }
+        .info-table td { border: none !important; border-bottom: 1px solid #000 !important; padding: 4px !important; text-align: left !important; font-size: 9pt; }
         .info-table tr:last-child td { border-bottom: none !important; }
 
-        /* Metin Alanları */
-        .engineer-row { margin: 10px 0; font-weight: bold; font-size: 10pt; }
-        .task-box { border: 1px solid var(--border-color); height: 280px; padding: 10px; margin-bottom: 10px; font-size: 10pt; }
-        .task-list { padding-left: 20px; margin: 0; }
+        .engineer-row { margin: 5px 0; font-weight: bold; font-size: 10pt; flex-shrink: 0; }
         
-        .visual-bar { border: 1px solid var(--border-color); text-align: center; font-weight: bold; padding: 4px; margin-bottom: 8px; font-size: 10pt; background: #fff; }
+        /* Sabit Başlık ve İş Alanı */
+        .task-area-container { border: 1px solid var(--border-color); flex-grow: 1; padding: 10px; margin-bottom: 10px; display: flex; flex-direction: column; background: #fff; text-align: left; }
+        .fixed-task-header { font-weight: bold; font-size: 10pt; margin-bottom: 5px; flex-shrink: 0; }
         
-        /* Dikey Resim Düzeni (4'lü) */
-        .image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; height: auto; }
-        .image-item { border: 1px solid #000; height: 380px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; background: #fdfdfd; }
-        .image-item img { width: 100%; height: 100%; object-fit: cover; display: none; }
-        .image-item span { color: #555; font-size: 11px; text-align: center; font-weight: bold; }
+        /* Düzenlenebilir İçerik Alanı */
+        .task-content-editable { flex-grow: 1; font-size: 10pt; outline: none; overflow-y: auto; white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.5; }
 
-        /* Yazdırma Modu */
+        .visual-section { margin-top: auto; padding-bottom: 5px; }
+        .visual-bar { border: 1px solid var(--border-color); text-align: center; font-weight: bold; padding: 4px; margin-bottom: 5px; font-size: 10pt; background: #fff; }
+        
+        .image-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .image-grid-6 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 4px; height: 860px; border: 1px solid #000; margin-top: 5px; }
+        
+        .image-item { border: 1px solid #000; position: relative; cursor: pointer; background: #fdfdfd; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .image-item-landscape { height: 240px; }
+        .image-item-grid { height: 100%; }
+
+        .img-number { position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; background: white; border: 2px solid #000; border-radius: 50%; z-index: 10; display: flex; align-items: center; justify-content: center; }
+        .img-number input { width: 100%; border: none; background: transparent; text-align: center; font-weight: bold; font-size: 14px; outline: none; margin: 0; padding: 0; }
+
+        .img-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .placeholder-text { color: #555; font-size: 10px; text-align: center; font-weight: bold; }
+
         @media print {
-            .controls, .image-item span { display: none !important; }
-            body { background: none; }
+            .controls, .placeholder-text { display: none !important; }
+            .img-number:has(input:placeholder-shown), .img-number:has(input[value=""]) { display: none !important; }
+            .task-content-editable { overflow: hidden; }
+            body { background: none; padding: 0; }
             .page { margin: 0; border: none; box-shadow: none; page-break-after: always; }
             @page { size: A4; margin: 0; }
         }
@@ -56,12 +66,16 @@
 <body>
 
 <div class="controls">
-    <h3>P-Tech Rapor Paneli</h3>
     <input type="date" id="inputDate">
-    <input type="text" id="inputEngineer" placeholder="Mühendis İsimlerini Girin..." value="İHSAN ÇETİN">
-    <textarea id="inputTasks" rows="4" placeholder="Yapılan işleri satır satır yazın..."></textarea>
+    <input type="text" id="inputEngineer" placeholder="Mühendis İsmi" value="İHSAN ÇETİN">
+    
     <div class="btn-group">
-        <button class="add-btn" onclick="addNewPage()">+ Yeni Sayfa Ekle (4 Dikey Resim)</button>
+        <button class="add-btn" onclick="insertMainTask()">+ Yeni Madde (1, 2...)</button>
+        <button class="sub-btn" onclick="insertSubTask()">+ Alt Başlık (a, b...)</button>
+    </div>
+    
+    <div class="btn-group">
+        <button class="add-btn" style="background:#495057" onclick="addNewPage()">+ Yeni Sayfa (6 Resim)</button>
         <button class="pdf-btn" onclick="window.print()">PDF OLARAK İNDİR</button>
     </div>
 </div>
@@ -74,7 +88,7 @@
                 <td class="title-box">P Tech Günlük İş Takip Raporu</td>
                 <td class="info-box">
                     <table class="info-table">
-                        <tr><td>Tarih: <span class="outDate">15.03.2026</span></td></tr>
+                        <tr><td>Tarih: <span class="outDate">...</span></td></tr>
                         <tr><td>Sayfa: 1</td></tr>
                     </table>
                 </td>
@@ -83,20 +97,26 @@
 
         <div class="engineer-row">TAKİBİ YAPAN MÜHENDİS: <span class="outEngineer">İHSAN ÇETİN</span></div>
 
-        <div class="task-box">
-            <strong>TAKİBİ YAPILAN İŞLER:</strong>
-            <ol class="task-list" id="outTasks"></ol>
+        <div class="task-area-container">
+            <div class="fixed-task-header">TAKİBİ YAPILAN İŞLER:</div>
+            <div class="task-content-editable" contenteditable="true" id="mainTasks"></div>
         </div>
 
-        <div class="visual-bar">Takibi Yapılan İşin Görselleri</div>
-        <div class="image-grid">
-            <div class="image-item" onclick="triggerFile(1)">
-                <span id="label1">+ FOTOĞRAF EKLE (DİKEY)</span>
-                <img id="prev1"><input type="file" id="file1" hidden onchange="preview(this, 'prev1', 'label1')">
-            </div>
-            <div class="image-item" onclick="triggerFile(2)">
-                <span id="label2">+ FOTOĞRAF EKLE (DİKEY)</span>
-                <img id="prev2"><input type="file" id="file2" hidden onchange="preview(this, 'prev2', 'label2')">
+        <div class="visual-section">
+            <div class="visual-bar">Takibi Yapılan İşin Görselleri</div>
+            <div class="image-grid-2">
+                <div class="image-item image-item-landscape">
+                    <div class="img-number"><input type="text" placeholder="" oninput="this.setAttribute('value', this.value)"></div>
+                    <span id="label1" class="placeholder-text" onclick="triggerFile(1)">+ RESİM</span>
+                    <img id="prev1" class="img-preview" onclick="triggerFile(1)">
+                    <input type="file" id="file1" hidden onchange="preview(this, 'prev1', 'label1')">
+                </div>
+                <div class="image-item image-item-landscape">
+                    <div class="img-number"><input type="text" placeholder="" oninput="this.setAttribute('value', this.value)"></div>
+                    <span id="label2" class="placeholder-text" onclick="triggerFile(2)">+ RESİM</span>
+                    <img id="prev2" class="img-preview" onclick="triggerFile(2)">
+                    <input type="file" id="file2" hidden onchange="preview(this, 'prev2', 'label2')">
+                </div>
             </div>
         </div>
     </div>
@@ -105,23 +125,37 @@
 <script>
     let pageCount = 1;
     let imgCount = 2;
+    let mainTaskCounter = 1;
+    let subTaskCounter = 0;
+    const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
-    // Tarih Formatlama (GG.AA.YYYY)
+    // Ana Madde Ekleme (1.    )
+    function insertMainTask() {
+        const area = document.getElementById('mainTasks');
+        const text = `\n${mainTaskCounter}.    `;
+        area.focus();
+        document.execCommand('insertText', false, text);
+        mainTaskCounter++;
+        subTaskCounter = 0; // Ana madde değişince alt başlık sıfırlanır
+    }
+
+    // Alt Başlık Ekleme (    a)    )
+    function insertSubTask() {
+        const area = document.getElementById('mainTasks');
+        const letter = alphabet[subTaskCounter % 26];
+        const text = `\n    ${letter})    `;
+        area.focus();
+        document.execCommand('insertText', false, text);
+        subTaskCounter++;
+    }
+
     document.getElementById('inputDate').addEventListener('change', function(e) {
-        const date = new Date(e.target.value);
-        const formatted = date.toLocaleDateString('tr-TR');
+        const formatted = new Date(e.target.value).toLocaleDateString('tr-TR');
         document.querySelectorAll('.outDate').forEach(el => el.innerText = formatted);
     });
 
-    // Mühendis İsmi Güncelleme
     document.getElementById('inputEngineer').addEventListener('input', e => {
         document.querySelectorAll('.outEngineer').forEach(el => el.innerText = e.target.value.toUpperCase());
-    });
-
-    // İş Listesi Güncelleme
-    document.getElementById('inputTasks').addEventListener('input', e => {
-        const lines = e.target.value.split('\n');
-        document.getElementById('outTasks').innerHTML = lines.map(l => l.trim() ? `<li>${l}</li>` : '').join('');
     });
 
     function triggerFile(id) { document.getElementById('file' + id).click(); }
@@ -146,36 +180,29 @@
         newPage.className = 'page';
         
         let gridHtml = '';
-        for(let i=1; i<=4; i++) {
+        for(let i=1; i<=6; i++) {
             imgCount++;
             gridHtml += `
-                <div class="image-item" onclick="triggerFile(${imgCount})">
-                    <span id="label${imgCount}">+ FOTOĞRAF EKLE (DİKEY)</span>
-                    <img id="prev${imgCount}">
+                <div class="image-item image-item-grid">
+                    <div class="img-number"><input type="text" placeholder="" oninput="this.setAttribute('value', this.value)"></div>
+                    <span id="label${imgCount}" class="placeholder-text" onclick="triggerFile(${imgCount})">+ RESİM</span>
+                    <img id="prev${imgCount}" class="img-preview" onclick="triggerFile(${imgCount})">
                     <input type="file" id="file${imgCount}" hidden onchange="preview(this, 'prev${imgCount}', 'label${imgCount}')">
                 </div>`;
         }
 
-        const currentDate = document.getElementById('inputDate').value 
-            ? new Date(document.getElementById('inputDate').value).toLocaleDateString('tr-TR') 
-            : "15.03.2026";
+        const dateVal = document.getElementById('inputDate').value;
+        const formattedDate = dateVal ? new Date(dateVal).toLocaleDateString('tr-TR') : "...";
 
         newPage.innerHTML = `
             <table class="header-table">
                 <tr>
-                    <td class="logo-box"><img src="logo.png" alt="P-TECH"></td>
+                    <td class="logo-box"><img src="logo.png"></td>
                     <td class="title-box">P Tech Günlük İş Takip Raporu</td>
-                    <td class="info-box">
-                        <table class="info-table">
-                            <tr><td>Tarih: ${currentDate}</td></tr>
-                            <tr><td>Sayfa: ${pageCount}</td></tr>
-                        </table>
-                    </td>
+                    <td class="info-box"><table class="info-table"><tr><td>Tarih: ${formattedDate}</td></tr><tr><td>Sayfa: ${pageCount}</td></tr></table></td>
                 </tr>
             </table>
-            <div class="image-grid" style="grid-template-rows: 1fr 1fr; height: 850px; margin-top: 10px;">
-                ${gridHtml}
-            </div>
+            <div class="image-grid-6">${gridHtml}</div>
         `;
         container.appendChild(newPage);
     }
